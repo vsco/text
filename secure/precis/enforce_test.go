@@ -5,11 +5,9 @@
 package precis
 
 import (
-	"fmt"
 	"reflect"
 	"testing"
 
-	"golang.org/x/text/internal/testtext"
 	"golang.org/x/text/secure/bidirule"
 )
 
@@ -19,7 +17,7 @@ type testCase struct {
 	err    error
 }
 
-var enforceTestCases = []struct {
+var testCases = []struct {
 	name  string
 	p     *Profile
 	cases []testCase
@@ -162,7 +160,6 @@ var enforceTestCases = []struct {
 		{"foo", "foo", nil},
 		{"Foo Bar", "Foo Bar", nil},
 		{"foo bar", "foo bar", nil},
-		{"\u03A3", "\u03A3", nil},
 		{"\u03C3", "\u03C3", nil},
 		// Greek final sigma is left as is (do not fold!)
 		{"\u03C2", "\u03C2", nil},
@@ -195,12 +192,11 @@ var enforceTestCases = []struct {
 		// {UsernameCaseMapped, "", "", errDisallowedRune},
 		{"juliet@example.com", "juliet@example.com", nil},
 		{"fussball", "fussball", nil},
-		{"fu\u00DFball", "fu\u00DFball", nil},
+		{"fu\u00DFball", "fussball", nil},
 		{"\u03C0", "\u03C0", nil},
 		{"\u03A3", "\u03C3", nil},
 		{"\u03C3", "\u03C3", nil},
-		// Greek final sigma is left as is (do not fold!)
-		{"\u03C2", "\u03C2", nil},
+		{"\u03C2", "\u03C3", nil},
 		{"\u0049", "\u0069", nil},
 		{"\u0049", "\u0069", nil},
 		{"\u03D2", "", errDisallowedRune},
@@ -215,7 +211,7 @@ var enforceTestCases = []struct {
 		{"\n", "", bidirule.ErrInvalid},
 		{"\u26D6", "", bidirule.ErrInvalid},
 		{"\u26FF", "", bidirule.ErrInvalid},
-		{"\uFB00", "", errDisallowedRune},
+		{"\uFB00", "ff", nil}, // Side effect of case folding.
 		{"\u1680", "", bidirule.ErrInvalid},
 		{" ", "", bidirule.ErrInvalid},
 		{"  ", "", bidirule.ErrInvalid},
@@ -231,6 +227,8 @@ var enforceTestCases = []struct {
 		{"\u0052\u030C", "ř", nil},
 
 		{"\u1E61", "\u1E61", nil}, // LATIN SMALL LETTER S WITH DOT ABOVE
+		// U+1e9B: case folded.
+		{"ẛ", "\u1E61", nil}, // LATIN SMALL LETTER LONG S WITH DOT ABOVE
 
 		// Confusable characters ARE allowed and should NOT be mapped.
 		{"\u0410", "\u0430", nil}, // CYRILLIC CAPITAL LETTER A
@@ -248,17 +246,6 @@ var enforceTestCases = []struct {
 		{"\u212B", "\u00c5", nil},    // Angstrom sign, NFC -> U+00E5
 		{"ẛ", "", errDisallowedRune}, // LATIN SMALL LETTER LONG S WITH DOT ABOVE
 	}},
-}
-
-func doTests(t *testing.T, fn func(t *testing.T, p *Profile, tc testCase)) {
-	for _, g := range enforceTestCases {
-		for i, tc := range g.cases {
-			name := fmt.Sprintf("%s:%d:%+q", g.name, i, tc.input)
-			testtext.Run(t, name, func(t *testing.T) {
-				fn(t, g.p, tc)
-			})
-		}
-	}
 }
 
 func TestString(t *testing.T) {

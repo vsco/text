@@ -23,7 +23,6 @@ type LDMLBCP47 struct {
 			Deprecated  string `xml:"deprecated,attr"`
 			Preferred   string `xml:"preferred,attr"`
 			Alias       string `xml:"alias,attr"`
-			ValueType   string `xml:"valueType,attr"`
 			Since       string `xml:"since,attr"`
 			Type        []*struct {
 				Common
@@ -207,19 +206,6 @@ type SupplementalData struct {
 			Territories string `xml:"territories,attr"`
 		} `xml:"paperSize"`
 	} `xml:"measurementData"`
-	UnitPreferenceData *struct {
-		Common
-		UnitPreferences []*struct {
-			Common
-			Category       string `xml:"category,attr"`
-			Usage          string `xml:"usage,attr"`
-			Scope          string `xml:"scope,attr"`
-			UnitPreference []*struct {
-				Common
-				Regions string `xml:"regions,attr"`
-			} `xml:"unitPreference"`
-		} `xml:"unitPreferences"`
-	} `xml:"unitPreferenceData"`
 	TimezoneData *struct {
 		Common
 		MapTimezones []*struct {
@@ -258,15 +244,13 @@ type SupplementalData struct {
 		Common
 		Transform []*struct {
 			Common
-			Source        string    `xml:"source,attr"`
-			Target        string    `xml:"target,attr"`
-			Variant       string    `xml:"variant,attr"`
-			Direction     string    `xml:"direction,attr"`
-			Alias         string    `xml:"alias,attr"`
-			BackwardAlias string    `xml:"backwardAlias,attr"`
-			Visibility    string    `xml:"visibility,attr"`
-			Comment       []*Common `xml:"comment"`
-			TRule         []*Common `xml:"tRule"`
+			Source     string    `xml:"source,attr"`
+			Target     string    `xml:"target,attr"`
+			Variant    string    `xml:"variant,attr"`
+			Direction  string    `xml:"direction,attr"`
+			Visibility string    `xml:"visibility,attr"`
+			Comment    []*Common `xml:"comment"`
+			TRule      []*Common `xml:"tRule"`
 		} `xml:"transform"`
 	} `xml:"transforms"`
 	Metadata *struct {
@@ -613,13 +597,6 @@ type SupplementalData struct {
 			IdStatus string `xml:"idStatus,attr"`
 		} `xml:"id"`
 	} `xml:"idValidity"`
-	RgScope *struct {
-		Common
-		RgPath []*struct {
-			Common
-			Path string `xml:"path,attr"`
-		} `xml:"rgPath"`
-	} `xml:"rgScope"`
 }
 
 // LDML is the top-level type for locale-specific data.
@@ -1437,4 +1414,4 @@ type Numbers struct {
 }
 
 // Version is the version of CLDR from which the XML definitions are generated.
-const Version = "29"
+const Version = "28"

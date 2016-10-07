@@ -9,7 +9,6 @@ import (
 	"testing"
 	"unicode/utf8"
 
-	"golang.org/x/text/internal/testtext"
 	"golang.org/x/text/transform"
 )
 
@@ -22,10 +21,8 @@ type transformTest struct {
 	out     string // result string of first call to Transform
 	outFull string // transform of entire input string
 	err     error
-	errSpan error
-	nSpan   int
 
-	t transform.SpanningTransformer
+	t transform.Transformer
 }
 
 const large = 10240
@@ -51,17 +48,6 @@ func (tt *transformTest) check(t *testing.T, i int) {
 	nDst, _, _ = tt.t.Transform(out[n:], src[nSrc:], true)
 	if got, want := string(out[:n+nDst]), tt.outFull; got != want {
 		t.Errorf("%d:%s:outFull: got %q; want %q", i, tt.desc, got, want)
-	}
-
-	tt.t.Reset()
-	p := 0
-	for ; p < len(tt.in) && p < len(tt.outFull) && tt.in[p] == tt.outFull[p]; p++ {
-	}
-	if tt.nSpan != 0 {
-		p = tt.nSpan
-	}
-	if n, err = tt.t.Span([]byte(tt.in), tt.atEOF); n != p || err != tt.errSpan {
-		t.Errorf("%d:%s:span: got %d, %v; want %d, %v", i, tt.desc, n, err, p, tt.errSpan)
 	}
 }
 
@@ -103,7 +89,6 @@ func TestMap(t *testing.T) {
 		out:     "ç",
 		outFull: "çççç",
 		err:     transform.ErrShortDst,
-		errSpan: transform.ErrEndOfSpan,
 		t:       rotate,
 	}, {
 		desc:    "short dst ascii, no change",
@@ -122,7 +107,6 @@ func TestMap(t *testing.T) {
 		out:     "ç",
 		outFull: "ç\ufffd",
 		err:     transform.ErrShortDst,
-		errSpan: transform.ErrEndOfSpan,
 		t:       rotate,
 	}, {
 		desc:    "short dst writing incomplete rune",
@@ -132,7 +116,6 @@ func TestMap(t *testing.T) {
 		out:     "ç",
 		outFull: "ç\ufffd",
 		err:     transform.ErrShortDst,
-		errSpan: transform.ErrEndOfSpan,
 		t:       rotate,
 	}, {
 		desc:    "short dst, longer",
@@ -160,7 +143,6 @@ func TestMap(t *testing.T) {
 		out:     "\ufffdHello",
 		outFull: "\ufffdHello\ufffd",
 		err:     transform.ErrShortDst,
-		errSpan: transform.ErrEndOfSpan,
 		t:       rotate,
 	}, {
 		desc:    "short src",
@@ -170,7 +152,6 @@ func TestMap(t *testing.T) {
 		out:     "ç",
 		outFull: "ç\ufffd",
 		err:     transform.ErrShortSrc,
-		errSpan: transform.ErrEndOfSpan,
 		t:       rotate,
 	}, {
 		desc:    "invalid input, atEOF",
@@ -179,7 +160,6 @@ func TestMap(t *testing.T) {
 		in:      "\x80",
 		out:     "\ufffd",
 		outFull: "\ufffd",
-		errSpan: transform.ErrEndOfSpan,
 		t:       rotate,
 	}, {
 		desc:    "invalid input, !atEOF",
@@ -188,26 +168,14 @@ func TestMap(t *testing.T) {
 		in:      "\x80",
 		out:     "\ufffd",
 		outFull: "\ufffd",
-		errSpan: transform.ErrEndOfSpan,
-		t:       rotate,
-	}, {
-		desc:    "incomplete rune !atEOF",
-		szDst:   large,
-		atEOF:   false,
-		in:      "\xc2",
-		out:     "",
-		outFull: "\ufffd",
-		err:     transform.ErrShortSrc,
-		errSpan: transform.ErrShortSrc,
 		t:       rotate,
 	}, {
 		desc:    "invalid input, incomplete rune atEOF",
 		szDst:   large,
 		atEOF:   true,
-		in:      "\xc2",
+		in:      "\xc0",
 		out:     "\ufffd",
 		outFull: "\ufffd",
-		errSpan: transform.ErrEndOfSpan,
 		t:       rotate,
 	}, {
 		desc:    "misc correct",
@@ -216,7 +184,6 @@ func TestMap(t *testing.T) {
 		in:      "a\U00012345 ç!",
 		out:     "ça 中!",
 		outFull: "ça 中!",
-		errSpan: transform.ErrEndOfSpan,
 		t:       rotate,
 	}, {
 		desc:    "misc correct and invalid",
@@ -225,7 +192,6 @@ func TestMap(t *testing.T) {
 		in:      "Hello\x80 w\x80orl\xc0d!\xc0",
 		out:     "Hello\ufffd w\ufffdorl\ufffdd!\ufffd",
 		outFull: "Hello\ufffd w\ufffdorl\ufffdd!\ufffd",
-		errSpan: transform.ErrEndOfSpan,
 		t:       rotate,
 	}, {
 		desc:    "misc correct and invalid, short src",
@@ -235,7 +201,6 @@ func TestMap(t *testing.T) {
 		out:     "Hello\ufffd w\ufffdorl\ufffdd!",
 		outFull: "Hello\ufffd w\ufffdorl\ufffdd!\ufffd",
 		err:     transform.ErrShortSrc,
-		errSpan: transform.ErrEndOfSpan,
 		t:       rotate,
 	}, {
 		desc:    "misc correct and invalid, short src, replacing RuneError",
@@ -244,7 +209,6 @@ func TestMap(t *testing.T) {
 		in:      "Hel\ufffdlo\x80 w\x80orl\xc0d!\xc2",
 		out:     "Hel?lo? w?orl?d!",
 		outFull: "Hel?lo? w?orl?d!?",
-		errSpan: transform.ErrEndOfSpan,
 		err:     transform.ErrShortSrc,
 		t: Map(func(r rune) rune {
 			if r == utf8.RuneError {
@@ -277,7 +241,6 @@ func TestRemove(t *testing.T) {
 			in:      "aaaa",
 			out:     "",
 			outFull: "",
-			errSpan: transform.ErrEndOfSpan,
 			t:       remove,
 		},
 		2: {
@@ -286,7 +249,6 @@ func TestRemove(t *testing.T) {
 			in:      "aaaa",
 			out:     "",
 			outFull: "",
-			errSpan: transform.ErrEndOfSpan,
 			t:       remove,
 		},
 		3: {
@@ -295,7 +257,6 @@ func TestRemove(t *testing.T) {
 			in:      "baaaa",
 			out:     "b",
 			outFull: "b",
-			errSpan: transform.ErrEndOfSpan,
 			t:       remove,
 		},
 		4: {
@@ -304,7 +265,6 @@ func TestRemove(t *testing.T) {
 			in:      "açaaa",
 			out:     "ç",
 			outFull: "ç",
-			errSpan: transform.ErrEndOfSpan,
 			t:       remove,
 		},
 		5: {
@@ -313,7 +273,6 @@ func TestRemove(t *testing.T) {
 			in:      "aaaç",
 			out:     "ç",
 			outFull: "ç",
-			errSpan: transform.ErrEndOfSpan,
 			t:       remove,
 		},
 		6: {
@@ -323,7 +282,6 @@ func TestRemove(t *testing.T) {
 			out:     "",
 			outFull: "\ufffd",
 			err:     transform.ErrShortDst,
-			errSpan: transform.ErrEndOfSpan,
 			t:       remove,
 		},
 		7: {
@@ -333,7 +291,6 @@ func TestRemove(t *testing.T) {
 			out:     "",
 			outFull: "\ufffd",
 			err:     transform.ErrShortDst,
-			errSpan: transform.ErrEndOfSpan,
 			t:       remove,
 		},
 		8: {
@@ -343,7 +300,6 @@ func TestRemove(t *testing.T) {
 			out:     "",
 			outFull: "\ufffd",
 			err:     transform.ErrShortSrc,
-			errSpan: transform.ErrEndOfSpan,
 			t:       remove,
 		},
 		9: {
@@ -352,7 +308,6 @@ func TestRemove(t *testing.T) {
 			in:      "\x80",
 			out:     "\ufffd",
 			outFull: "\ufffd",
-			errSpan: transform.ErrEndOfSpan,
 			t:       remove,
 		},
 		10: {
@@ -361,104 +316,78 @@ func TestRemove(t *testing.T) {
 			in:      "\x80",
 			out:     "\ufffd",
 			outFull: "\ufffd",
-			errSpan: transform.ErrEndOfSpan,
 			t:       remove,
 		},
 		11: {
 			szDst:   large,
 			atEOF:   true,
-			in:      "\xc2",
+			in:      "\xc0",
 			out:     "\ufffd",
 			outFull: "\ufffd",
-			errSpan: transform.ErrEndOfSpan,
 			t:       remove,
 		},
 		12: {
-			szDst:   large,
-			atEOF:   false,
-			in:      "\xc2",
-			out:     "",
-			outFull: "\ufffd",
-			err:     transform.ErrShortSrc,
-			errSpan: transform.ErrShortSrc,
-			t:       remove,
-		},
-		13: {
 			szDst:   large,
 			atEOF:   true,
 			in:      "Hello \U00012345world!",
 			out:     "Hll wrld!",
 			outFull: "Hll wrld!",
-			errSpan: transform.ErrEndOfSpan,
 			t:       remove,
 		},
-		14: {
+		13: {
 			szDst:   large,
 			atEOF:   true,
 			in:      "Hello\x80 w\x80orl\xc0d!\xc0",
 			out:     "Hll\ufffd w\ufffdrl\ufffdd!\ufffd",
 			outFull: "Hll\ufffd w\ufffdrl\ufffdd!\ufffd",
-			errSpan: transform.ErrEndOfSpan,
 			t:       remove,
 		},
-		15: {
+		14: {
 			szDst:   large,
 			atEOF:   false,
 			in:      "Hello\x80 w\x80orl\xc0d!\xc2",
 			out:     "Hll\ufffd w\ufffdrl\ufffdd!",
 			outFull: "Hll\ufffd w\ufffdrl\ufffdd!\ufffd",
 			err:     transform.ErrShortSrc,
-			errSpan: transform.ErrEndOfSpan,
 			t:       remove,
 		},
-		16: {
+		15: {
 			szDst:   large,
 			atEOF:   false,
 			in:      "Hel\ufffdlo\x80 w\x80orl\xc0d!\xc2",
 			out:     "Hello world!",
 			outFull: "Hello world!",
 			err:     transform.ErrShortSrc,
-			errSpan: transform.ErrEndOfSpan,
 			t:       Remove(Predicate(func(r rune) bool { return r == utf8.RuneError })),
 		},
-		17: {
+		16: {
 			szDst:   4,
 			atEOF:   true,
 			in:      "Hellø",
 			out:     "Hll",
 			outFull: "Hllø",
 			err:     transform.ErrShortDst,
-			errSpan: transform.ErrEndOfSpan,
 			t:       remove,
 		},
-		18: {
+		17: {
 			szDst:   4,
 			atEOF:   false,
 			in:      "Hellø",
 			out:     "Hll",
 			outFull: "Hllø",
 			err:     transform.ErrShortDst,
-			errSpan: transform.ErrEndOfSpan,
 			t:       remove,
 		},
-		19: {
+		18: {
 			szDst:   8,
 			atEOF:   false,
 			in:      "\x80Hello\uFF24\x80",
 			out:     "\ufffdHll",
 			outFull: "\ufffdHll\ufffd",
 			err:     transform.ErrShortDst,
-			errSpan: transform.ErrEndOfSpan,
 			t:       remove,
 		},
-		20: {
-			szDst:   8,
-			atEOF:   false,
-			in:      "Hllll",
-			out:     "Hllll",
-			outFull: "Hllll",
-			t:       remove,
-		}} {
+	} {
 		tt.check(t, i)
 	}
 }
@@ -491,17 +420,15 @@ func TestReplaceIllFormed(t *testing.T) {
 			out:     "a",
 			outFull: "a\ufffd",
 			err:     transform.ErrShortDst,
-			errSpan: transform.ErrEndOfSpan,
 			t:       replace,
 		},
 		3: {
 			szDst:   1,
 			atEOF:   true,
-			in:      "a\xc2",
+			in:      "a\xc0",
 			out:     "a",
 			outFull: "a\ufffd",
 			err:     transform.ErrShortDst,
-			errSpan: transform.ErrEndOfSpan,
 			t:       replace,
 		},
 		4: {
@@ -510,7 +437,6 @@ func TestReplaceIllFormed(t *testing.T) {
 			in:      "\x80",
 			out:     "\ufffd",
 			outFull: "\ufffd",
-			errSpan: transform.ErrEndOfSpan,
 			t:       replace,
 		},
 		5: {
@@ -519,7 +445,6 @@ func TestReplaceIllFormed(t *testing.T) {
 			in:      "\x80",
 			out:     "\ufffd",
 			outFull: "\ufffd",
-			errSpan: transform.ErrEndOfSpan,
 			t:       replace,
 		},
 		6: {
@@ -528,7 +453,6 @@ func TestReplaceIllFormed(t *testing.T) {
 			in:      "\xc2",
 			out:     "\ufffd",
 			outFull: "\ufffd",
-			errSpan: transform.ErrEndOfSpan,
 			t:       replace,
 		},
 		7: {
@@ -538,7 +462,6 @@ func TestReplaceIllFormed(t *testing.T) {
 			out:     "",
 			outFull: "\ufffd",
 			err:     transform.ErrShortSrc,
-			errSpan: transform.ErrShortSrc,
 			t:       replace,
 		},
 		8: {
@@ -555,7 +478,6 @@ func TestReplaceIllFormed(t *testing.T) {
 			in:      "Hello\x80 w\x80orl\xc2d!\xc2",
 			out:     "Hello\ufffd w\ufffdorl\ufffdd!\ufffd",
 			outFull: "Hello\ufffd w\ufffdorl\ufffdd!\ufffd",
-			errSpan: transform.ErrEndOfSpan,
 			t:       replace,
 		},
 		10: {
@@ -565,23 +487,12 @@ func TestReplaceIllFormed(t *testing.T) {
 			out:     "Hello\ufffd w\ufffdorl\ufffdd!",
 			outFull: "Hello\ufffd w\ufffdorl\ufffdd!\ufffd",
 			err:     transform.ErrShortSrc,
-			errSpan: transform.ErrEndOfSpan,
 			t:       replace,
 		},
 		16: {
 			szDst:   10,
 			atEOF:   false,
 			in:      "\x80Hello\x80",
-			out:     "\ufffdHello",
-			outFull: "\ufffdHello\ufffd",
-			err:     transform.ErrShortDst,
-			errSpan: transform.ErrEndOfSpan,
-			t:       replace,
-		},
-		17: {
-			szDst:   10,
-			atEOF:   false,
-			in:      "\ufffdHello\ufffd",
 			out:     "\ufffdHello",
 			outFull: "\ufffdHello\ufffd",
 			err:     transform.ErrShortDst,
@@ -593,7 +504,7 @@ func TestReplaceIllFormed(t *testing.T) {
 }
 
 func TestMapAlloc(t *testing.T) {
-	if n := testtext.AllocsPerRun(3, func() {
+	if n := testing.AllocsPerRun(3, func() {
 		Map(idem).Transform(nil, nil, false)
 	}); n > 0 {
 		t.Errorf("got %f; want 0", n)
@@ -603,7 +514,7 @@ func TestMapAlloc(t *testing.T) {
 func rmNop(r rune) bool { return false }
 
 func TestRemoveAlloc(t *testing.T) {
-	if n := testtext.AllocsPerRun(3, func() {
+	if n := testing.AllocsPerRun(3, func() {
 		Remove(Predicate(rmNop)).Transform(nil, nil, false)
 	}); n > 0 {
 		t.Errorf("got %f; want 0", n)
@@ -611,52 +522,59 @@ func TestRemoveAlloc(t *testing.T) {
 }
 
 func TestReplaceIllFormedAlloc(t *testing.T) {
-	if n := testtext.AllocsPerRun(3, func() {
+	if n := testing.AllocsPerRun(3, func() {
 		ReplaceIllFormed().Transform(nil, nil, false)
 	}); n > 0 {
 		t.Errorf("got %f; want 0", n)
 	}
 }
 
-func doBench(b *testing.B, t Transformer) {
-	for _, bc := range []struct{ name, data string }{
-		{"ascii", testtext.ASCII},
-		{"3byte", testtext.ThreeByteUTF8},
-	} {
-		dst := make([]byte, 2*len(bc.data))
-		src := []byte(bc.data)
+func BenchmarkRemove(b *testing.B) {
+	dst := make([]byte, len(input))
+	src := []byte(input)
 
-		testtext.Bench(b, bc.name+"/transform", func(b *testing.B) {
-			b.SetBytes(int64(len(src)))
-			for i := 0; i < b.N; i++ {
-				t.Transform(dst, src, true)
-			}
-		})
-		src = t.Bytes(src)
-		t.Reset()
-		testtext.Bench(b, bc.name+"/span", func(b *testing.B) {
-			b.SetBytes(int64(len(src)))
-			for i := 0; i < b.N; i++ {
-				t.Span(src, true)
-			}
-		})
+	r := Remove(Predicate(func(r rune) bool { return r == 'e' }))
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		r.Transform(dst, src, true)
 	}
 }
 
-func BenchmarkRemove(b *testing.B) {
-	doBench(b, Remove(Predicate(func(r rune) bool { return r == 'e' })))
-}
-
 func BenchmarkMapAll(b *testing.B) {
-	doBench(b, Map(func(r rune) rune { return 'a' }))
+	dst := make([]byte, 2*len(input))
+	src := []byte(input)
+
+	r := Map(func(r rune) rune { return 'a' })
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		r.Transform(dst, src, true)
+	}
 }
 
 func BenchmarkMapNone(b *testing.B) {
-	doBench(b, Map(func(r rune) rune { return r }))
+	dst := make([]byte, 2*len(input))
+	src := []byte(input)
+
+	r := Map(func(r rune) rune { return r })
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		r.Transform(dst, src, true)
+	}
 }
 
 func BenchmarkReplaceIllFormed(b *testing.B) {
-	doBench(b, ReplaceIllFormed())
+	dst := make([]byte, 2*len(input))
+	src := []byte(input)
+
+	t := ReplaceIllFormed()
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		t.Transform(dst, src, true)
+	}
 }
 
 var (

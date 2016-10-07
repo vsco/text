@@ -9,7 +9,6 @@ import (
 	"testing"
 	"unicode"
 
-	"golang.org/x/text/internal/testtext"
 	"golang.org/x/text/language"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
@@ -64,11 +63,6 @@ func contextFromRune(r rune) *context {
 }
 
 func TestCaseProperties(t *testing.T) {
-	if unicode.Version != UnicodeVersion {
-		// Properties of existing code points may change by Unicode version, so
-		// we need to skip.
-		t.Skipf("Skipping as core Unicode version %s different than %s", unicode.Version, UnicodeVersion)
-	}
 	assigned := rangetable.Assigned(UnicodeVersion)
 	coreVersion := rangetable.Assigned(unicode.Version)
 	for r := rune(0); r <= lastRuneForTesting; r++ {
@@ -103,9 +97,6 @@ func TestCaseProperties(t *testing.T) {
 func TestMapping(t *testing.T) {
 	assigned := rangetable.Assigned(UnicodeVersion)
 	coreVersion := rangetable.Assigned(unicode.Version)
-	if coreVersion == nil {
-		coreVersion = assigned
-	}
 	apply := func(r rune, f func(c *context) bool) string {
 		c := contextFromRune(r)
 		f(c)
@@ -168,9 +159,6 @@ func runeFoldData(r rune) (x struct{ simple, full, special string }) {
 func TestFoldData(t *testing.T) {
 	assigned := rangetable.Assigned(UnicodeVersion)
 	coreVersion := rangetable.Assigned(unicode.Version)
-	if coreVersion == nil {
-		coreVersion = assigned
-	}
 	apply := func(r rune, f func(c *context) bool) (string, info) {
 		c := contextFromRune(r)
 		f(c)
@@ -212,31 +200,17 @@ func TestCCC(t *testing.T) {
 }
 
 func TestWordBreaks(t *testing.T) {
-	for _, tt := range breakTest {
-		testtext.Run(t, tt, func(t *testing.T) {
-			parts := strings.Split(tt, "|")
-			want := ""
-			for _, s := range parts {
-				found := false
-				// This algorithm implements title casing given word breaks
-				// as defined in the Unicode standard 3.13 R3.
-				for _, r := range s {
-					title := unicode.ToTitle(r)
-					lower := unicode.ToLower(r)
-					if !found && title != lower {
-						found = true
-						want += string(title)
-					} else {
-						want += string(lower)
-					}
-				}
-			}
-			src := strings.Join(parts, "")
-			got := Title(language.Und).String(src)
-			if got != want {
-				t.Errorf("got %q; want %q", got, want)
-			}
-		})
+	for i, tt := range breakTest {
+		parts := strings.Split(tt, "|")
+		want := ""
+		for _, s := range parts {
+			want += Title(language.Und).String(s)
+		}
+		src := strings.Join(parts, "")
+		got := Title(language.Und).String(src)
+		if got != want {
+			t.Errorf("%d: title(%q) = %q; want %q", i, src, got, want)
+		}
 	}
 }
 

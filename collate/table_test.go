@@ -7,8 +7,8 @@ package collate
 import (
 	"testing"
 
-	"golang.org/x/text/collate/build"
-	"golang.org/x/text/internal/colltab"
+	"golang.org/x/text/collate/colltab"
+	build "golang.org/x/text/collate/tbuild"
 	"golang.org/x/text/unicode/norm"
 )
 

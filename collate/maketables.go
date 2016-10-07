@@ -26,8 +26,8 @@ import (
 	"unicode/utf8"
 
 	"golang.org/x/text/collate"
-	"golang.org/x/text/collate/build"
-	"golang.org/x/text/internal/colltab"
+	"golang.org/x/text/collate/colltab"
+	build "golang.org/x/text/collate/tbuild"
 	"golang.org/x/text/internal/gen"
 	"golang.org/x/text/language"
 	"golang.org/x/text/unicode/cldr"

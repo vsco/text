@@ -19,7 +19,7 @@ import (
 	"testing"
 	"unicode/utf8"
 
-	"golang.org/x/text/collate/build"
+	build "golang.org/x/text/collate/tbuild"
 	"golang.org/x/text/internal/gen"
 	"golang.org/x/text/language"
 )
