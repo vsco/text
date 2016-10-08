@@ -9,7 +9,7 @@ package main
 import (
 	"unicode/utf8"
 
-	"golang.org/x/text/internal/format/plural"
+	"github.com/vsco/text/internal/format/plural"
 )
 
 // A system identifies a CLDR numbering system.

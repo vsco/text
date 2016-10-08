@@ -7,8 +7,8 @@ package cases_test
 import (
 	"fmt"
 
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
+	"github.com/vsco/text/cases"
+	"github.com/vsco/text/language"
 )
 
 func Example() {

@@ -11,8 +11,8 @@ import (
 	"strings"
 	"unicode"
 
-	"golang.org/x/text/collate/colltab"
-	"golang.org/x/text/unicode/norm"
+	"github.com/vsco/text/collate/colltab"
+	"github.com/vsco/text/unicode/norm"
 )
 
 type logicalAnchor int

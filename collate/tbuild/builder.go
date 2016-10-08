@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package tbuild // import "golang.org/x/text/collate/build"
+package tbuild // import "github.com/vsco/text/collate/build"
 
 import (
 	"fmt"
@@ -12,9 +12,9 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"golang.org/x/text/collate/colltab"
-	"golang.org/x/text/language"
-	"golang.org/x/text/unicode/norm"
+	"github.com/vsco/text/collate/colltab"
+	"github.com/vsco/text/language"
+	"github.com/vsco/text/unicode/norm"
 )
 
 // TODO: optimizations:

@@ -10,8 +10,8 @@ import (
 	"strconv"
 	"strings"
 
-	"golang.org/x/text/internal/gen"
-	"golang.org/x/text/internal/ucd"
+	"github.com/vsco/text/internal/gen"
+	"github.com/vsco/text/internal/ucd"
 )
 
 var (

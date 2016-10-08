@@ -5,11 +5,11 @@
 package precis
 
 import (
-	"golang.org/x/text/cases"
-	"golang.org/x/text/runes"
-	"golang.org/x/text/transform"
-	"golang.org/x/text/unicode/norm"
-	"golang.org/x/text/width"
+	"github.com/vsco/text/cases"
+	"github.com/vsco/text/runes"
+	"github.com/vsco/text/transform"
+	"github.com/vsco/text/unicode/norm"
+	"github.com/vsco/text/width"
 )
 
 // An Option is used to define the behavior and rules of a Profile.

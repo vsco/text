@@ -9,8 +9,8 @@ import (
 	"strings"
 	"testing"
 
-	"golang.org/x/text/internal/testtext"
-	"golang.org/x/text/transform"
+	"github.com/vsco/text/internal/testtext"
+	"github.com/vsco/text/transform"
 )
 
 func foldRune(r rune) (folded rune, ok bool) {

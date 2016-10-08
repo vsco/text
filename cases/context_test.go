@@ -9,10 +9,10 @@ import (
 	"testing"
 	"unicode"
 
-	"golang.org/x/text/language"
-	"golang.org/x/text/transform"
-	"golang.org/x/text/unicode/norm"
-	"golang.org/x/text/unicode/rangetable"
+	"github.com/vsco/text/language"
+	"github.com/vsco/text/transform"
+	"github.com/vsco/text/unicode/norm"
+	"github.com/vsco/text/unicode/rangetable"
 )
 
 // The following definitions are taken directly from Chapter 3 of The Unicode

@@ -7,15 +7,15 @@
 //
 // NOTE: Under construction. See https://golang.org/design/12750-localization
 // and its corresponding proposal issue https://golang.org/issues/12750.
-package message // import "golang.org/x/text/message"
+package message // import "github.com/vsco/text/message"
 
 import (
 	"fmt"
 	"io"
 	"strings"
 
-	"golang.org/x/text/internal/format"
-	"golang.org/x/text/language"
+	"github.com/vsco/text/internal/format"
+	"github.com/vsco/text/language"
 )
 
 // A Printer implements language-specific formatted I/O analogous to the fmt
@@ -165,7 +165,7 @@ func (p *Printer) bindArgs(a []interface{}) []interface{} {
 	return out
 }
 
-// state implements "golang.org/x/text/internal/format".State.
+// state implements "github.com/vsco/text/internal/format".State.
 type state struct {
 	fmt.State
 	p *Printer

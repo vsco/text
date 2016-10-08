@@ -10,7 +10,7 @@ import (
 	"testing"
 	"unicode"
 
-	"golang.org/x/text/language"
+	"github.com/vsco/text/language"
 )
 
 // TODO: test that tables are properly dropped by the linker for various use

@@ -7,8 +7,8 @@ package currency
 import (
 	"testing"
 
-	"golang.org/x/text/language"
-	"golang.org/x/text/message"
+	"github.com/vsco/text/language"
+	"github.com/vsco/text/message"
 )
 
 var (

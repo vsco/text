@@ -7,7 +7,7 @@ package unicode
 import (
 	"testing"
 
-	"golang.org/x/text/transform"
+	"github.com/vsco/text/transform"
 )
 
 func TestUTF8Decoder(t *testing.T) {

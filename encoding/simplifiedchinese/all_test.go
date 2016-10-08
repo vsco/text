@@ -7,9 +7,9 @@ package simplifiedchinese
 import (
 	"testing"
 
-	"golang.org/x/text/encoding"
-	"golang.org/x/text/encoding/internal"
-	"golang.org/x/text/transform"
+	"github.com/vsco/text/encoding"
+	"github.com/vsco/text/encoding/internal"
+	"github.com/vsco/text/transform"
 )
 
 func dec(e encoding.Encoding) (dir string, t transform.Transformer, err error) {

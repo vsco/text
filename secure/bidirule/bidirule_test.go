@@ -7,8 +7,8 @@ package bidirule
 import (
 	"testing"
 
-	"golang.org/x/text/transform"
-	"golang.org/x/text/unicode/bidi"
+	"github.com/vsco/text/transform"
+	"github.com/vsco/text/unicode/bidi"
 )
 
 const (

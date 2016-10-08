@@ -5,14 +5,14 @@
 package htmlindex
 
 import (
-	"golang.org/x/text/encoding"
-	"golang.org/x/text/encoding/charmap"
-	"golang.org/x/text/encoding/internal/identifier"
-	"golang.org/x/text/encoding/japanese"
-	"golang.org/x/text/encoding/korean"
-	"golang.org/x/text/encoding/simplifiedchinese"
-	"golang.org/x/text/encoding/traditionalchinese"
-	"golang.org/x/text/encoding/unicode"
+	"github.com/vsco/text/encoding"
+	"github.com/vsco/text/encoding/charmap"
+	"github.com/vsco/text/encoding/internal/identifier"
+	"github.com/vsco/text/encoding/japanese"
+	"github.com/vsco/text/encoding/korean"
+	"github.com/vsco/text/encoding/simplifiedchinese"
+	"github.com/vsco/text/encoding/traditionalchinese"
+	"github.com/vsco/text/encoding/unicode"
 )
 
 // mibMap maps a MIB identifier to an htmlEncoding index.

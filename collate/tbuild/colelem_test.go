@@ -7,7 +7,7 @@ package tbuild
 import (
 	"testing"
 
-	"golang.org/x/text/collate/colltab"
+	"github.com/vsco/text/collate/colltab"
 )
 
 type ceTest struct {

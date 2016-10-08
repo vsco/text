@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"testing"
 
-	"golang.org/x/text/secure/bidirule"
+	"github.com/vsco/text/secure/bidirule"
 )
 
 type testCase struct {

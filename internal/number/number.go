@@ -10,8 +10,8 @@ package number
 import (
 	"unicode/utf8"
 
-	"golang.org/x/text/internal"
-	"golang.org/x/text/language"
+	"github.com/vsco/text/internal"
+	"github.com/vsco/text/language"
 )
 
 // Info holds number formatting configuration data.

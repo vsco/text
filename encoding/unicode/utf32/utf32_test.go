@@ -7,7 +7,7 @@ package utf32
 import (
 	"testing"
 
-	"golang.org/x/text/transform"
+	"github.com/vsco/text/transform"
 )
 
 var (

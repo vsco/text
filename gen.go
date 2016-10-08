@@ -20,7 +20,7 @@ import (
 	"sync"
 	"unicode"
 
-	"golang.org/x/text/internal/gen"
+	"github.com/vsco/text/internal/gen"
 )
 
 var (

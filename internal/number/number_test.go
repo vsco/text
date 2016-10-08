@@ -7,7 +7,7 @@ package number
 import (
 	"testing"
 
-	"golang.org/x/text/language"
+	"github.com/vsco/text/language"
 )
 
 func TestInfo(t *testing.T) {

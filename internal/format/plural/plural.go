@@ -10,7 +10,7 @@
 // details.
 package plural
 
-import "golang.org/x/text/internal/format"
+import "github.com/vsco/text/internal/format"
 
 // Form defines a plural form. The meaning of plural forms, as well as which
 // forms are supported, vary per language. Each language must at least support

@@ -9,7 +9,7 @@ import (
 	"testing"
 	"unicode/utf8"
 
-	"golang.org/x/text/transform"
+	"github.com/vsco/text/transform"
 )
 
 type transformTest struct {

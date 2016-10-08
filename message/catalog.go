@@ -10,9 +10,9 @@ package message
 import (
 	"sync"
 
-	"golang.org/x/text/internal"
-	"golang.org/x/text/internal/format"
-	"golang.org/x/text/language"
+	"github.com/vsco/text/internal"
+	"github.com/vsco/text/internal/format"
+	"github.com/vsco/text/language"
 )
 
 // DefaultCatalog is used by SetString.

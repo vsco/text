@@ -14,11 +14,11 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"golang.org/x/text/internal"
-	"golang.org/x/text/internal/gen"
-	"golang.org/x/text/internal/stringset"
-	"golang.org/x/text/language"
-	"golang.org/x/text/unicode/cldr"
+	"github.com/vsco/text/internal"
+	"github.com/vsco/text/internal/gen"
+	"github.com/vsco/text/internal/stringset"
+	"github.com/vsco/text/language"
+	"github.com/vsco/text/unicode/cldr"
 )
 
 var (
@@ -53,7 +53,7 @@ func main() {
 	w := gen.NewCodeWriter()
 	defer w.WriteGoFile(*outputFile, pkg)
 
-	fmt.Fprintln(w, `import "golang.org/x/text/internal/stringset"`)
+	fmt.Fprintln(w, `import "github.com/vsco/text/internal/stringset"`)
 
 	gen.WriteCLDRVersion(w)
 
@@ -64,7 +64,7 @@ func main() {
 	w = gen.NewCodeWriter()
 	defer w.WriteGoFile(*outputTestFile, pkg)
 
-	fmt.Fprintln(w, `import "golang.org/x/text/internal/format/plural"`)
+	fmt.Fprintln(w, `import "github.com/vsco/text/internal/format/plural"`)
 
 	genPluralsTests(w, data)
 }

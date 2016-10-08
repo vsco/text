@@ -8,10 +8,10 @@ import (
 	"errors"
 	"unicode/utf8"
 
-	"golang.org/x/text/runes"
-	"golang.org/x/text/secure/bidirule"
-	"golang.org/x/text/transform"
-	"golang.org/x/text/width"
+	"github.com/vsco/text/runes"
+	"github.com/vsco/text/secure/bidirule"
+	"github.com/vsco/text/transform"
+	"github.com/vsco/text/width"
 )
 
 var (
